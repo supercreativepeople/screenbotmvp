@@ -699,6 +699,10 @@ const GearMenu = ({ visible, onClose, onActionButtons, onSortResults, onScanAgai
             <View style={styles.gearDivider} />
           </>
         )}
+        <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); Linking.openURL('https://screenbot.app'); }}>
+          <Text style={styles.gearItemText}>Try SCREENBot Desktop</Text>
+        </TouchableOpacity>
+        <View style={styles.gearDivider} />
         <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); Linking.openURL('https://screenbot.app/privacy'); }}>
           <Text style={styles.gearItemText}>Privacy Policy</Text>
         </TouchableOpacity>
