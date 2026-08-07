@@ -39,3 +39,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# local backup files, not part of shipped app
+*.bak
+*.bak2
+*.bak3
+*.bak4

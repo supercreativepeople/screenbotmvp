@@ -1,29 +1,42 @@
 {
   "expo": {
-    "name": "screenbot-mvp",
+    "name": "SCREENBot",
     "slug": "screenbot-mvp",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "16.0"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "41140292-bb49-470b-ab40-bc9339482079"
+      }
     },
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.supercreativepeople.screenbotmvp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "SCREENBot scans your Screenshots album to classify and organize your saved images — for example, identifying saved songs, movies, events, and shopping items so you can take action on them directly from the app.",
+        "NSPhotoLibraryAddUsageDescription": "SCREENBot may save processed screenshots back to your Photos library."
+      }
     },
+    "scheme": "screenbotmvp",
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
+      "package": "com.supercreativepeople.screenbotmvp"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "icon": "./assets/SB_BOT_WELCOME.png"
   }
 }
