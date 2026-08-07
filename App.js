@@ -664,11 +664,11 @@ const PaywallModal = ({ visible, onDismiss, onPurchase }) => {
             <Text style={{ color: '#888', fontSize: 13 }}>Maybe later</Text>
           </TouchableOpacity>
           <View style={{ flexDirection: 'row', gap: 16, justifyContent: 'center' }}>
-            <TouchableOpacity onPress={() => Linking.openURL('https://supercreativepeople.com/screenbot/privacy')}>
+            <TouchableOpacity onPress={() => Linking.openURL('https://screenbot.app/privacy')}>
               <Text style={{ color: '#444', fontSize: 11, textDecorationLine: 'underline' }}>Privacy Policy</Text>
             </TouchableOpacity>
             <Text style={{ color: '#333', fontSize: 11 }}>·</Text>
-            <TouchableOpacity onPress={() => Linking.openURL('https://supercreativepeople.com/screenbot/terms')}>
+            <TouchableOpacity onPress={() => Linking.openURL('https://screenbot.app/terms')}>
               <Text style={{ color: '#444', fontSize: 11, textDecorationLine: 'underline' }}>Terms of Use</Text>
             </TouchableOpacity>
           </View>
@@ -699,11 +699,11 @@ const GearMenu = ({ visible, onClose, onActionButtons, onSortResults, onScanAgai
             <View style={styles.gearDivider} />
           </>
         )}
-        <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); Linking.openURL('https://supercreativepeople.com/screenbot/privacy'); }}>
+        <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); Linking.openURL('https://screenbot.app/privacy'); }}>
           <Text style={styles.gearItemText}>Privacy Policy</Text>
         </TouchableOpacity>
         <View style={styles.gearDivider} />
-        <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); Linking.openURL('https://supercreativepeople.com/screenbot/terms'); }}>
+        <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); Linking.openURL('https://screenbot.app/terms'); }}>
           <Text style={styles.gearItemText}>Terms of Use</Text>
         </TouchableOpacity>
       </View>
