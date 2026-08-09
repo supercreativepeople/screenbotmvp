@@ -9,7 +9,7 @@
 | 90%+ classification accuracy (118-image test set) | ✅ |
 | iPhone + iPad universal app | ✅ |
 | In-app purchases (Free / Pro) | ✅ Live via RevenueCat |
-| Analytics pipeline | ✅ Mixpanel wired end-to-end |
+| Analytics pipeline | ✅ Aptabase wired end-to-end |
 | Legal pages (Privacy, Terms, Support) | ✅ Live |
 | iOS App Store submission | ⏳ In Review |
 

@@ -7,12 +7,14 @@ import {
 } from 'react-native';
 
 import * as MediaLibrary from 'expo-media-library';
+import Constants from 'expo-constants';
+import * as Application from 'expo-application';
 import { Video, ResizeMode, Audio } from 'expo-av';
 import * as ImageManipulator from 'expo-image-manipulator';
 import TextRecognition from '@react-native-ml-kit/text-recognition';
 import { classifyScreenshot, enrichResult, getMusicActions, getMovieActions, getShoppingActions } from './lib/api';
 import { saveResults, loadResults, savePrefs, loadPrefs, addToLists, forceAddToList, loadLists, saveLists, removeFromList } from './lib/storage';
-import { track, initMixpanel, Events } from './lib/analytics';
+import { track, Events } from './lib/analytics';
 import { initRevenueCat, getProStatus, getUsageIdentity, getOfferings, purchasePackage, restorePurchases } from './lib/revenueCat';
 
 // Responsive scaling — base design is 390px wide (iPhone 14/15)
@@ -679,7 +681,51 @@ const PaywallModal = ({ visible, onDismiss, onPurchase }) => {
   );
 };
 
-const GearMenu = ({ visible, onClose, onActionButtons, onSortResults, onScanAgain, onMyLists, onUpgrade, isPro }) => (
+const AboutModal = ({ visible, onDismiss }) => {
+  const version = Constants.expoConfig?.version || Application.nativeApplicationVersion || '—';
+  const build = Application.nativeBuildVersion || Constants.expoConfig?.ios?.buildNumber || '—';
+  return (
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onDismiss}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#1C1C1E' }}>
+          <TouchableOpacity onPress={onDismiss} style={{ paddingHorizontal: 4 }}>
+            <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600' }}>‹ Back</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView contentContainerStyle={{ padding: 28, paddingBottom: 48, alignItems: 'center' }}>
+          <Image source={require('./assets/SB_BOT_ICON_1024_OFFICIAL.png')} style={{ width: 90, height: 90, marginBottom: 12 }} resizeMode="contain" />
+          <Text style={{ color: '#fff', fontSize: 26, fontWeight: '800', textAlign: 'center', marginBottom: 4 }}>
+            SCREENBot
+          </Text>
+          <Text style={{ color: '#888', fontSize: 14, textAlign: 'center', marginBottom: 20 }}>
+            Your AI Screenshot Assistant
+          </Text>
+
+          <View style={{ height: 1, backgroundColor: '#222', width: '100%', marginBottom: 20 }} />
+
+          <Text style={{ color: '#ccc', fontSize: 15, marginBottom: 6 }}>
+            Version {version} (Build {build})
+          </Text>
+          <Text style={{ color: '#555', fontSize: 12, textAlign: 'center', marginBottom: 24 }}>
+            © 2026 Frisson Digital, Inc. All rights reserved.
+          </Text>
+
+          <View style={{ flexDirection: 'row', gap: 16, justifyContent: 'center' }}>
+            <TouchableOpacity onPress={() => Linking.openURL('https://screenbot.app/privacy')}>
+              <Text style={{ color: '#444', fontSize: 11, textDecorationLine: 'underline' }}>Privacy Policy</Text>
+            </TouchableOpacity>
+            <Text style={{ color: '#333', fontSize: 11 }}>·</Text>
+            <TouchableOpacity onPress={() => Linking.openURL('https://screenbot.app/terms')}>
+              <Text style={{ color: '#444', fontSize: 11, textDecorationLine: 'underline' }}>Terms of Use</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </Modal>
+  );
+};
+
+const GearMenu = ({ visible, onClose, onActionButtons, onSortResults, onScanAgain, onMyLists, onUpgrade, onAbout, isPro }) => (
   <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
     <TouchableOpacity style={styles.gearOverlay} activeOpacity={1} onPress={onClose}>
       <View style={styles.gearMenu}>
@@ -710,6 +756,10 @@ const GearMenu = ({ visible, onClose, onActionButtons, onSortResults, onScanAgai
         <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); Linking.openURL('https://screenbot.app/terms'); }}>
           <Text style={styles.gearItemText}>Terms of Use</Text>
         </TouchableOpacity>
+        <View style={styles.gearDivider} />
+        <TouchableOpacity style={styles.gearItem} onPress={() => { onClose(); onAbout(); }}>
+          <Text style={styles.gearItemText}>About</Text>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   </Modal>
@@ -726,15 +776,6 @@ const Toast = ({ message, visible }) => {
 };
 
 export default function App() {
-  // Configure audio session so video plays with sound
-  React.useEffect(() => {
-    Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      allowsRecordingIOS: false,
-      staysActiveInBackground: false,
-    });
-  }, []);
-
   const [screen,           setScreen]           = useState('welcome');
   const [processed,        setProcessed]        = useState([]);
   const [sessionScanned,   setSessionScanned]   = useState(false); // true after first scan this session
@@ -770,18 +811,34 @@ export default function App() {
   const [scanCount,        setScanCount]        = useState(0);     // scans used this month
   const [showPaywall,      setShowPaywall]      = useState(false); // paywall modal // item for ImageReviewModal from list screen
   const [editingListItem,  setEditingListItem]  = useState(null); // item for EditMetadataModal from list screen
+  const [showAbout,        setShowAbout]        = useState(false); // about modal — version/build info
 
   // In dev: auto-resume to results if data exists (avoids re-scanning on every hot reload)
   // In production: always land on welcome
   useEffect(() => {
-    initMixpanel().then(() => track(Events.APP_OPENED));
+    track(Events.APP_OPENED);
     initRevenueCat().then(() => getProStatus().then(pro => setIsPro(pro))).catch(e => console.warn('[RC] init failed:', e));
-    // Allow audio to play through speaker regardless of silent switch
+    // Allow audio to play through speaker regardless of silent switch.
+    // This is the ONLY place this is configured (2026-08-09: removed a
+    // second, near-duplicate setAudioModeAsync call that used to fire in
+    // its own useEffect right above this one on every app launch, and a
+    // third that fired again in runScan() right before the scan video
+    // played — see CLAUDE.md "Scan-loop audio delay" for why stacking
+    // reconfigurations right before playback was the likely cause of the
+    // audio-lags-behind-video bug).
     Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
+      allowsRecordingIOS: false,
       staysActiveInBackground: false,
     });
   }, []);
+
+  // Paywall Viewed — single instrumentation point covering all seven
+  // setShowPaywall(true) call sites in this file, rather than tracking at
+  // each one individually.
+  useEffect(() => {
+    if (showPaywall) track(Events.PAYWALL_VIEWED);
+  }, [showPaywall]);
 
   useEffect(() => {
     (async () => {
@@ -903,8 +960,6 @@ const getOtherActions = (item) => {
       return;
     }
     track(Events.SCREENSHOT_UPLOADED, { trigger: 'scan_button' });
-    // Pre-configure audio session immediately so video plays without delay
-    await Audio.setAudioModeAsync({ playsInSilentModeIOS: true, staysActiveInBackground: false });
     setSessionScanned(true);
     scanCursorRef.current = null; // reset cursor on manual scan
     // Odd scans (1,3,5…) start fresh; even scans (2,4,6…) resume from last position
@@ -1127,7 +1182,12 @@ const getOtherActions = (item) => {
         onScanAgain={() => setScreen('welcome')}
         onMyLists={() => { setActiveList(null); setScreen('lists'); }}
         onUpgrade={() => { setShowGear(false); setShowPaywall(true); }}
+        onAbout={() => { setShowGear(false); setShowAbout(true); }}
         isPro={isPro}
+      />
+      <AboutModal
+        visible={showAbout}
+        onDismiss={() => setShowAbout(false)}
       />
 
       {/* WELCOME ANIMATION — plays once on first open */}
@@ -1225,9 +1285,6 @@ const getOtherActions = (item) => {
               if (status.isLoaded && status.positionMillis) {
                 scanVideoPositionRef.current = status.positionMillis;
               }
-            }}
-            onReadyForDisplay={() => {
-              scanVideoRef.current?.playAsync().catch(() => {});
             }}
             useNativeControls={false}
           />
