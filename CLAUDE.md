@@ -51,10 +51,10 @@ Gear menu has a "Try SCREENBot Desktop" item (added 2026-08-07) linking to `http
 
 ## App Store submission history
 
-- **v1.2.0 (Build 9) submitted 2026-08-07, 9:01 PM — Waiting for Review.** First submission attempt was Build 8 at v1.1.0, rejected same day for the version-numbering reason above. Includes: "Try SCREENBot Desktop" gear-menu link, Privacy/Terms link fix, and the App Store Connect metadata fixes above.
+- **v1.2.0 (Build 9) submitted 2026-08-07, 9:01 PM — review completed 2026-08-08, 1:16 PM PDT (Apple confirmation email, submission ID `8a42f9ee-a329-4f30-8b7c-8ff2ff190700`), App Store Connect shows status "Ready for Distribution" — live on the App Store.** ("Ready for Distribution" is Apple's current label for what used to be called "Ready for Sale" — it means live, not just approved-and-pending-release; Apple's own note is that it can take up to 24 hours after release for the listing to be publicly visible everywhere.) First submission attempt was Build 8 at v1.1.0, rejected same day for the version-numbering reason above. Includes: "Try SCREENBot Desktop" gear-menu link, Privacy/Terms link fix, and the App Store Connect metadata fixes above.
 
-## Open items (as of 2026-08-07)
+## Open items (as of 2026-08-08)
 
-- v1.2.0 (Build 9) awaiting Apple App Review decision (up to 48 hours per Apple's own estimate).
+- v1.2.0 (Build 9) is live — no action needed unless a new release is planned.
 - Mixpanel SDK still active despite lapsed billing — decide whether to actually remove it from the app, see above.
 - Android path (`npx expo run:android`) is present in `app.json`/`package.json` but untested and unshipped — don't assume parity with iOS.
